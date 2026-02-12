@@ -1,0 +1,79 @@
+# Import Libraries
+import pyvisa
+import time
+# Make sure openpyxl is installed
+import pandas as pd
+import numpy
+
+
+# Variables
+rm = pyvisa.ResourceManager()
+addresses = rm.list_resources()
+
+# Establish addresses for the tabletop equipment
+for j in range(len(addresses)):
+    if len(addresses[j]) >= 25:
+        match addresses[j][22:25]:
+            case 'SPD':
+                supply = rm.open_resource(addresses[j])
+            case 'SDM':
+                dmm = rm.open_resource(addresses[j])
+            case 'SDG':
+                fungen = rm.open_resource(addresses[j])
+            case 'SDS':
+                oscope = rm.open_resource(addresses[j])
+            case _:
+                print("No matching instrument")
+                # #Setup Devices
+print(rm.list_resources())
+
+# Configuring sessions
+
+dmm.read_termination = '\n'
+dmm.write_termination = '\n'
+dmm.timeout = 10000  # 10 seconds
+
+print("DMM ID:", dmm.query("*IDN?"))
+
+dmm.write("*RST")  # reset to default
+dmm.write("*CLS")  # clear status
+dmm.write("CONF:VOLT:AC")  # AC voltage mode
+
+
+def part_3():
+    cur = []
+    volt = []
+    res = []
+
+    supply.write("CH1:CURR .01")  # Set current to 10mA
+    current = supply.query("MEAS: CURR? CH1")  # Measures what current is set to
+    time.sleep(120)  # Allow wires to settle for 2 minutes
+    volts = float(dmm.query("MEAS:VOLT:DC?"))  # Measure voltage
+    resistance = volts / current  # Calculates the resistance
+    cur.append(current)  # Adds current reading to cur list
+    volt.append(volts)  # Adds volts reading to volt list
+    res.append(resistance)  # Adds resistance reading to res list
+
+    supply.write("CH1:CURR .1")  # Set current to 100mA
+    current = supply.query("MEAS: CURR? CH1")  # Measures what current is set to
+    time.sleep(120)  # Allow wires to settle for 2 minutes
+    volts = float(dmm.query("MEAS:VOLT:DC?"))  # Measure voltage
+    resistance = volts / current  # Calculates the resistance
+    cur.append(current)  # Adds current reading to cur list
+    volt.append(volts)  # Adds volts reading to volt list
+    res.append(resistance)  # Adds resistance reading to res list
+
+    supply.write("CH1:CURR 1")  # Set current to 1A
+    current = supply.query("MEAS: CURR? CH1")  # Measures what current is set to
+    time.sleep(120)  # Allow wires to settle for 2 minutes
+    volts = float(dmm.query("MEAS:VOLT:DC?"))  # Measure voltage
+    resistance = volts / current  # Calculates the resistance
+    cur.append(current)  # Adds current reading to cur list
+    volt.append(volts)  # Adds volts reading to volt list
+    res.append(resistance)  # Adds resistance reading to res list
+
+    df = pd.DataFrame(cur, volts, res,
+                      columns=["Current", "Voltage", "Resistance"])  # Exports everything to an excel file in 3 columns
+    df.to_excel("part_3.xlsx", index=False)
+
+
