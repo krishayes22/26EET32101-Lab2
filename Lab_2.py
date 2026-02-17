@@ -35,7 +35,7 @@ print("DMM ID:", dmm.query("*IDN?"))
 
 dmm.write("*RST")                   # reset to default
 dmm.write("*CLS")                   # clear status
-dmm.write("CONF:VOLT:DC")           # AC voltage mode
+dmm.write("CONF:VOLT:DC")           # DC voltage mode
 
 
 
@@ -73,3 +73,4 @@ def part_3():
 
 part_3()
 supply.write("OUTP CH1,OFF")
+
