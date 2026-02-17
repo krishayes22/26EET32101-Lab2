@@ -35,7 +35,7 @@ print("DMM ID:", dmm.query("*IDN?"))
 
 dmm.write("*RST")                   # reset to default
 dmm.write("*CLS")                   # clear status
-dmm.write("CONF:VOLT:DC")           # AC voltage mode
+dmm.write("CONF:VOLT:DC")           # DC voltage mode
 
 
 
@@ -55,8 +55,10 @@ def part_3():
         cur = float(supply.query("MEAS:CURR? CH1"))     # Measures what current is set to
         time.sleep(0.5)
         print(cur)
-        time.sleep(10)                                  # Allow wires to settle for 2 minutes
         volt = float(dmm.query("MEAS:VOLT:DC?"))        # Measure voltage
+        supply.write("CH1:CURR 0")                      # Set current to 10mA
+        print(float(supply.query("MEAS:CURR? CH1")))    # Measures what current is set to
+        time.sleep(120)                                 # Allow wires to settle for 2 minutes
         print(volt)
         res = volt/x                                    # Calculates the resistance
         print(res)
@@ -69,7 +71,8 @@ def part_3():
         })
 
         df = pd.DataFrame(data, columns=["Voltage", "Current", "Resistance"]) # Exports everything to an excel file in 3 columns
-        df.to_excel("part_3.xlsx", index=False)
+        df.to_excel("part_3_wire#.xlsx", index=False)
 
 part_3()
 supply.write("OUTP CH1,OFF")
+
