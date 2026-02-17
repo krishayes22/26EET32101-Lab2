@@ -55,7 +55,7 @@ def part_3():
         cur = float(supply.query("MEAS:CURR? CH1"))     # Measures what current is set to
         time.sleep(0.5)
         print(cur)
-        time.sleep(10)                                  # Allow wires to settle for 2 minutes
+        time.sleep(120)                                  # Allow wires to settle for 2 minutes
         volt = float(dmm.query("MEAS:VOLT:DC?"))        # Measure voltage
         print(volt)
         res = volt/x                                    # Calculates the resistance
@@ -73,4 +73,5 @@ def part_3():
 
 part_3()
 supply.write("OUTP CH1,OFF")
+
 
