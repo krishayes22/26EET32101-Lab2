@@ -76,3 +76,5 @@ def part_3():
 part_3()
 supply.write("OUTP CH1,OFF")
 
+
+
